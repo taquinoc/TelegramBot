@@ -28,7 +28,7 @@ const executarMonitoramento = (chatId) => {
       })
       .then(function () {
       });
-}, 5000);
+}, 600000);
 }
 const pararMonitoramento = () => {
   clearInterval(executionTime)
