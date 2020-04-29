@@ -39,9 +39,9 @@ bot.onText(/\/command (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const command = match[1];
 
-  if(command !== "ajuda" || command !== "monitorar" || command !== "parar"){
-    bot.sendMessage(chatId, "O comando que você digitou é inválido, experimente digitar /command ajuda")
-  }
+  // if(command !== "ajuda" || command !== "monitorar" || command !== "parar"){
+  //   bot.sendMessage(chatId, "O comando que você digitou é inválido, experimente digitar /command ajuda")
+  // }
 
   if(command === "ajuda"){
     bot.sendMessage(chatId, "Comandos disponíveis:\n /command monitorar \n /command parar");
