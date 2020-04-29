@@ -8,7 +8,6 @@ const axios = require('axios').default //Axios para fazer requisições no LinkA
 const token = `${process.env.BOT_TOKEN}`;
 
 const bot = new TelegramBot(token, {polling: true});
-bot.on('Bot iniciado :D');
 
 let executionTime = '';
 const executeMonitoring = (chatId) => {
