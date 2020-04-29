@@ -8,9 +8,10 @@ const axios = require('axios').default //Axios para fazer requisições no LinkA
 const token = `${process.env.BOT_TOKEN}`;
 
 const bot = new TelegramBot(token, {polling: true});
+bot.on('Bot iniciado :D');
 
 let executionTime = '';
-const executarMonitoramento = (chatId) => {
+const executeMonitoring = (chatId) => {
   executionTime = setInterval(function(){
     const url = `${process.env.API_URL}${process.env.API_KEY}`
     axios.get(url)
@@ -30,9 +31,8 @@ const executarMonitoramento = (chatId) => {
       });
 }, 600000);
 }
-const pararMonitoramento = () => {
+const stopMonitoring = () => {
   clearInterval(executionTime)
-
 }
 
 let isMonitoring = 0;
@@ -40,24 +40,28 @@ bot.onText(/\/command (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const command = match[1];
 
-  if(command == "ajuda"){
+  if(command !== "ajuda" || command !== "monitorar" || command !== "parar"){
+    bot.sendMessage(chatId, "O comando que você digitou é inválido, experimente digitar /command ajuda")
+  }
+
+  if(command === "ajuda"){
     bot.sendMessage(chatId, "Comandos disponíveis:\n /command monitorar \n /command parar");
   }
   
-  if(command == "monitorar"){
-    if(isMonitoring == 1){
+  if(command === "monitorar"){
+    if(isMonitoring === 1){
       return bot.sendMessage(chatId, "O Bot já está monitorando, para parar de executar digite /command parar");
     }
     bot.sendMessage(chatId, "Monitoramento iniciado");
     isMonitoring = 1;
-    executarMonitoramento(chatId)
+    executeMonitoring(chatId)
   }
-  if(command == "parar"){
-    if(isMonitoring == 0){
+  if(command === "parar"){
+    if(isMonitoring === 0){
       return bot.sendMessage(chatId, "O Bot já está parado, para executar utilize o comando /command monitorar");
     }
     bot.sendMessage(chatId, "Monitoramento parado");
     isMonitoring = 0
-    pararMonitoramento()
+    stopMonitoring()
   }
 });
