@@ -11,7 +11,7 @@ const bot = new TelegramBot(token, { polling: true });
 
 let executionTime = '';
 let timer = 600000;
-const executeMonitoring = (chatId) => {
+const executeMonitoring = (chatId,timer) => {
   executionTime = setInterval(function () {
     const url = `${process.env.API_URL}${process.env.API_KEY}`
     axios.get(url)
@@ -36,25 +36,35 @@ const stopMonitoring = () => {
 }
 
 let isMonitoring = 0;
-
 bot.onText(/\/command (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
-  const command = match[1];
+  const command = match[1].split(' ');
+  console.log(match)
 
-  // Seria interessante se houvesse uma função que setasse o tempo (em minutos) na hora de monitorar
-  // já deixei preparado na váriavel 'timer' na linha 13
-
-  switch (command) {
+  switch (command[0]) {
     case "ajuda":
-      bot.sendMessage(chatId, "Comandos disponíveis:\n /command monitorar \n /command parar \n /command info");
+      bot.sendMessage(chatId, "Comandos disponíveis:\n /command monitorar tempo(ms) \n /command parar \n /command info");
       break;
     case "monitorar":
       if (isMonitoring === 1) {
         return bot.sendMessage(chatId, "O Bot já está monitorando, para parar de executar digite /command parar");
       }
-      bot.sendMessage(chatId, "Monitoramento iniciado");
-      isMonitoring = 1;
-      executeMonitoring(chatId)
+      if(command[1] && command[1].match(/\d+/g)){
+        if(command[1] >= 5000 && command[1] <= 600000){
+          bot.sendMessage(chatId, `Monitoramento iniciado em ${command[1]}ms`);
+          isMonitoring = 1;
+          timer = command[1]
+          return executeMonitoring(chatId, timer)
+        } else {
+          bot.sendMessage(chatId, "Tempo inserido para o monitoramento invalido o valor tem que ser maior que 5000ms e menor que 600000ms");
+        }
+      } else if (command[1] && !command[1].match(/\d+/g)){
+        return bot.sendMessage(chatId, "O segundo argumento precisa ser um número entre 5000 a 600000");
+      }else {
+        bot.sendMessage(chatId, `Monitoramento iniciado em ${timer}ms`);
+        isMonitoring = 1;
+        return executeMonitoring(chatId, timer)
+      }
       break;
     case "parar":
       if (isMonitoring === 0) {
